@@ -16,7 +16,9 @@
 
 INITSEG  = 0x9000	! we move boot here - out of the way
 SYSSEG   = 0x1000	! system loaded at 0x10000 (65536).
-SETUPSEG = 0x9020	! this is the current segment
+SETUPSEG = 0x9020	! this is the current segment 
+	！setup.s is loaded at. It is used for the gdt and idt, and
+			! for the floppy-dma area (see below). C语言中之后会用作系统缓冲区。
 
 .globl begtext, begdata, begbss, endtext, enddata, endbss
 .text

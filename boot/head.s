@@ -15,14 +15,16 @@
 .globl _idt,_gdt,_pg_dir,_tmp_floppy_area
 _pg_dir:
 startup_32:
+# setup the segment registers, and the stack.
 	movl $0x10,%eax
 	mov %ax,%ds
 	mov %ax,%es
 	mov %ax,%fs
 	mov %ax,%gs
 	lss _stack_start,%esp # 和sched.c中的stack_start对应
-	call setup_idt
+	call setup_idt #重新设置中断向量表，gdt和idt变化了
 	call setup_gdt
+	# gdt和idt重新设置了，因为有变化，所以重新算一遍
 	movl $0x10,%eax		# reload all the segment registers
 	mov %ax,%ds		# after changing gdt. CS was already
 	mov %ax,%es		# reloaded in 'setup_gdt'
@@ -76,7 +78,7 @@ check_x87:
  *  written by the page tables.
  */
 setup_idt:
-	lea ignore_int,%edx
+	lea ignore_int,%edx # 设置哑中断，先不设置中断
 	movl $0x00080000,%eax
 	movw %dx,%ax		/* selector = 0x0008 = cs */
 	movw $0x8E00,%dx	/* interrupt gate - dpl=0, present */
@@ -89,7 +91,7 @@ rp_sidt:
 	addl $8,%edi
 	dec %ecx
 	jne rp_sidt
-	lidt idt_descr
+	lidt idt_descr # 加载 idt表的首地址
 	ret
 
 /*
@@ -143,7 +145,7 @@ L6:
 	jmp L6			# main should never return here, but
 				# just in case, we know what happens.
 
-/* This is the default interrupt "handler" :-) */
+/* This is the default interrupt "handler" :-) 哑中断 */
 int_msg:
 	.asciz "Unknown interrupt\n\r"
 .align 2
@@ -219,6 +221,7 @@ setup_paging:
 
 .align 2
 .word 0
+# idt的位置
 idt_descr:
 	.word 256*8-1		# idt contains 256 entries
 	.long _idt
@@ -232,7 +235,8 @@ gdt_descr:
 _idt:	.fill 256,8,0		# idt is uninitialized
 
 _gdt:	.quad 0x0000000000000000	/* NULL descriptor */
-	.quad 0x00c09a0000000fff	/* 16Mb */
-	.quad 0x00c0920000000fff	/* 16Mb */
+	.quad 0x00c09a0000000fff	/* 段限长变了。 16Mb 内核代码段 由原来的setup.c 的8Mb变为16Mb*/
+	.quad 0x00c0920000000fff	/* 16Mb 内核数据段*/
 	.quad 0x0000000000000000	/* TEMPORARY - don't use */
-	.fill 252,8,0			/* space for LDT's and TSS's etc */
+	.fill 252,8,0			/* space for LDT's and TSS's etc 最多64对，一共最多64进程
+				图2-17 */
