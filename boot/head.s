@@ -13,7 +13,7 @@
  */
 .text
 .globl _idt,_gdt,_pg_dir,_tmp_floppy_area
-_pg_dir:
+_pg_dir: # page directory 0x00000
 startup_32:
 # setup the segment registers, and the stack.
 	movl $0x10,%eax
@@ -118,7 +118,23 @@ setup_gdt:
  * using 4 of them to span 16 Mb of physical memory. People with
  * more than 16MB will have to expand this.
  */
-.org 0x1000
+ # page tables are set up to identity-map the first 16MB of physical memory.
+ # pg_dir 图1-37
+ # 4个页表，第一个0x0000是页目录表
+.org 0x1000 # one page size = 4kB = 0x1000. one entry in the page directory is 4 bytes, so 1024 entries = 4kB. 
+# The page directory is at 0x0000-0x4fff,
+# the first page table is at 0x1000-0x1fff,
+# the second page table is at 0x2000-0x2fff,
+# the third page table is at 0x3000-0x3fff,
+# the fourth page table is at 0x4000-0x4fff.
+# Each page table has 1024 entries, each entry is 4 bytes, so each page table is also 4kB.
+
+# change the page directory is equal to change the 进程的虚拟地址空间, because the page directory is the root of the page table hierarchy. Changing the page directory changes the mapping of virtual addresses to physical addresses for the entire process.
+
+# 4 pages total is 16MB,same to the gdt and idt, which are also 16MB. 
+# And is used for kernel code and data. 
+
+
 pg0:
 
 .org 0x2000
@@ -138,7 +154,8 @@ pg3:
  */
 _tmp_floppy_area:
 	.fill 1024,1,0
-
+	
+# from check_x87 to here
 after_page_tables:
 	pushl $0		# These are the parameters to main :-)
 	pushl $0
