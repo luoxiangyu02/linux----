@@ -64,12 +64,17 @@ struct task_struct *last_task_used_math = NULL;
 
 struct task_struct * task[NR_TASKS] = {&(init_task.task), };
 
-long user_stack [ PAGE_SIZE>>2 ] ;
+// ---从这里
+long user_stack [ PAGE_SIZE>>2 ] ; //这里除以4是因为long类型占4个字节,所以这里定义了一个PAGE_SIZE大小的栈空间,
+//用来存放用户态的栈数据，表示用户态的栈空间大小为PAGE_SIZE字节，实际上是一个数组，数组的每个元素是一个long类型，占4个字节，所以数组的长度为PAGE_SIZE/4，即PAGE_SIZE>>2。
 
 struct {
 	long * a;
 	short b;
 	} stack_start = { & user_stack [PAGE_SIZE>>2] , 0x10 };
+
+// --到这里  是同一个东西
+
 /*
  *  'math_state_restore()' saves the current math information in the
  * old math state array, and gets the new ones from the current task

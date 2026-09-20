@@ -20,7 +20,7 @@ startup_32:
 	mov %ax,%es
 	mov %ax,%fs
 	mov %ax,%gs
-	lss _stack_start,%esp
+	lss _stack_start,%esp # 和sched.c中的stack_start对应
 	call setup_idt
 	call setup_gdt
 	movl $0x10,%eax		# reload all the segment registers
