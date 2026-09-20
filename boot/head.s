@@ -154,15 +154,15 @@ pg3:
  */
 _tmp_floppy_area:
 	.fill 1024,1,0
-	
+
 # from check_x87 to here
 after_page_tables:
 	pushl $0		# These are the parameters to main :-)
 	pushl $0
 	pushl $0
 	pushl $L6		# return address for main, if it decides to.
-	pushl $_main
-	jmp setup_paging
+	pushl $_main  # to main.c
+	jmp setup_paging # after this,to the main.c 图1-46
 L6:
 	jmp L6			# main should never return here, but
 				# just in case, we know what happens.
