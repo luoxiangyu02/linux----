@@ -42,13 +42,17 @@ startup_32:
  * 486 users probably want to set the NE (#5) bit also, so as to use
  * int 16 for math errors.
  */
- 
+ # 检测浮点型运算器
 	movl %cr0,%eax		# check math chip
 	andl $0x80000011,%eax	# Save PG,PE,ET
+	/*bit 31 PG：分页已开启
+		bit 4  ET：扩展类型，表示使用 387 类型协处理器
+		bit 0  PE：保护模式
+	*/
 /* "orl $0x10020,%eax" here for 486 might be good */
 	orl $2,%eax		# set MP
 	movl %eax,%cr0
-	call check_x87
+	call check_x87 # x87 is the floating point unit, check if it is present and initialize it
 	jmp after_page_tables
 
 /*
