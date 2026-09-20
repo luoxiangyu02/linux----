@@ -32,16 +32,17 @@ startup_32:
 	mov %ax,%gs
 	lss _stack_start,%esp
 	xorl %eax,%eax
-1:	incl %eax		# check that A20 really IS enabled
-	movl %eax,0x000000	# loop forever if it isn't
+1:	incl %eax		# check that A20 really IS enabled. increase 1 bit
+	movl %eax,0x000000	# loop forever if it isn't . put the incremented value to 0x000000, which is the first byte of the page directory. If A20 is not enabled, this will wrap around and overwrite the first byte of the page directory, causing a page fault when paging is enabled.
 	cmpl %eax,0x100000
-	je 1b
+	je 1b # if  enable back to 1, check again. 0x100000 is the first byte of the second page, which is not affected by A20. If the value at 0x000000 is  equal to the value at 0x100000, it means A20 is not enabled and we need to loop again.
 /*
  * NOTE! 486 should set bit 16, to check for write-protect in supervisor
  * mode. Then it would be unnecessary with the "verify_area()"-calls.
  * 486 users probably want to set the NE (#5) bit also, so as to use
  * int 16 for math errors.
  */
+ 
 	movl %cr0,%eax		# check math chip
 	andl $0x80000011,%eax	# Save PG,PE,ET
 /* "orl $0x10020,%eax" here for 486 might be good */
