@@ -396,16 +396,22 @@ void do_no_page(unsigned long error_code,unsigned long address)
 	oom();
 }
 
+// 图2-05
 void mem_init(long start_mem, long end_mem)
 {
 	int i;
 
+	// mem_map数组的每个元素对应一个页框，mem_map[i] = 0表示该页框空闲，mem_map[i] = USED表示该页框已被占用
+	// 并且，为什么mem_map的每一个元素占用unsigned char类型，而不是bit类型呢? 
+	// 是因为要进行共享内存 ,每个页框的引用计数可能大于1，所以需要一个字节来存储引用计数，而不是一个bit。
 	HIGH_MEMORY = end_mem;
 	for (i=0 ; i<PAGING_PAGES ; i++)
-		mem_map[i] = USED;
+		mem_map[i] = USED;// 一个字节对应一个页，这个数组是内存分页管理的最核心数据结构,分配与释放,先初始化为100
 	i = MAP_NR(start_mem);
 	end_mem -= start_mem;
 	end_mem >>= 12;
+	// 前6M内存已经被内核占用，不能使用，所以将前6M的页框标记为已使用 为100
+	// 后面的内存页框标记为0，表示空闲
 	while (end_mem-->0)
 		mem_map[i++]=0;
 }
