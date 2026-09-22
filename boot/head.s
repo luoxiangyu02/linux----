@@ -221,24 +221,38 @@ ignore_int:
 .align 2
 setup_paging:
 	movl $1024*5,%ecx		/* 5 pages - pg_dir+4 page tables */
-	xorl %eax,%eax
+	xorl %eax,%eax	# 清空eax寄存器
 	xorl %edi,%edi			/* pg_dir is at 0x000 */
 	cld;rep;stosl
+	/*
+		页表项低 3 位是标志位
+		7 = 0b111 表示：
+		bit0 = 1：present（存在,是否分配物理页）未分页的话会报缺页中断
+		bit1 = 1：r/w（可读写） equal to 1: read/write, equal to 0: read-only code is not writable
+		bit2 = 1：user（用户态可访问）	user=1(3 privilege levels), kernel=0(0 privilege levels)
+	*/
+	# 设置页目录表的前4个页表项，分别指向pg0, pg1, pg2, pg3，每个页表项的低3位设置为7，表示存在、可读写、用户态可访问
 	movl $pg0+7,_pg_dir		/* set present bit/user r/w */
 	movl $pg1+7,_pg_dir+4		/*  --------- " " --------- */
 	movl $pg2+7,_pg_dir+8		/*  --------- " " --------- */
 	movl $pg3+7,_pg_dir+12		/*  --------- " " --------- */
+	# think? 线性页和物理页的映射是否一致 图1-42 往页表里面填值
 	movl $pg3+4092,%edi
 	movl $0xfff007,%eax		/*  16Mb - 4096 + 7 (r/w user,p) */
 	std
 1:	stosl			/* fill pages backwards - more efficient :-) */
 	subl $0x1000,%eax
 	jge 1b
+	#--- 直到这里
+
 	xorl %eax,%eax		/* pg_dir is at 0x0000 */
-	movl %eax,%cr3		/* cr3 - page directory start */
-	movl %cr0,%eax
-	orl $0x80000000,%eax
-	movl %eax,%cr0		/* set paging (PG) bit */
+	movl %eax,%cr3		/* cr3 - page directory start  页目录表基址寄存器*/
+	
+	movl %cr0,%eax	
+	orl $0x80000000,%eax # 打开分页功能，设置CR0寄存器的第31位（PG位）为1，启用分页
+	movl %eax,%cr0		/* set paging (PG) bit  CR0 是控制寄存器 
+										CR0的第0为是 PE ，最高位是PG */
+	# 内核的分页完成了，带特权级，带保护模式的内核程序完成了
 	ret			/* this also flushes prefetch-queue */
 
 .align 2
