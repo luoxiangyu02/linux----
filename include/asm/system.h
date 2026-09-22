@@ -19,6 +19,9 @@ __asm__ ("movl %%esp,%%eax\n\t" \
 
 #define iret() __asm__ ("iret"::)
 
+//3 图 2-09
+// dpl是特权级,type是门类型,addr是中断处理程序的地址
+// 将idt项做出来,图2-07
 #define _set_gate(gate_addr,type,dpl,addr) \
 __asm__ ("movw %%dx,%%ax\n\t" \
 	"movw %0,%%dx\n\t" \
@@ -33,6 +36,7 @@ __asm__ ("movw %%dx,%%ax\n\t" \
 #define set_intr_gate(n,addr) \
 	_set_gate(&idt[n],14,0,addr)
 
+	//2
 #define set_trap_gate(n,addr) \
 	_set_gate(&idt[n],15,0,addr)
 

@@ -182,6 +182,8 @@ void trap_init(void)
 {
 	int i;
 
+	//idt表的第0项
+	//图2-9
 	set_trap_gate(0,&divide_error);
 	set_trap_gate(1,&debug);
 	set_trap_gate(2,&nmi);
