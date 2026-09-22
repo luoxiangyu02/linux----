@@ -55,6 +55,7 @@ long rd_init(long mem_start, int length)
 	char	*cp;
 
 	blk_dev[MAJOR_NR].request_fn = DEVICE_REQUEST;
+	// ramdisk 清零
 	rd_start = (char *) mem_start;
 	rd_length = length;
 	cp = rd_start;

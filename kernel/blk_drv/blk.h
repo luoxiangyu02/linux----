@@ -20,6 +20,7 @@
  * paging, 'bh' is NULL, and 'waiting' is used to wait for
  * read/write completion.
  */
+ //块设置请求指令
 struct request {
 	int dev;		/* -1 if no request */
 	int cmd;		/* READ or WRITE */
@@ -43,7 +44,7 @@ struct request {
 (s1)->sector < (s2)->sector)))
 
 struct blk_dev_struct {
-	void (*request_fn)(void);
+	void (*request_fn)(void);// function pointer to the request function for the block device
 	struct request * current_request;
 };
 

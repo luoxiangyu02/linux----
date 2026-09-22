@@ -107,10 +107,13 @@ void main(void)		/* This really IS void, no error here. */
  * Interrupts are still disabled. Do necessary setups, then
  * enable them
  */
- 	ROOT_DEV = ORIG_ROOT_DEV;
+ 	ROOT_DEV = ORIG_ROOT_DEV;// 图2-1 机器数据
  	drive_info = DRIVE_INFO;
-	memory_end = (1<<20) + (EXT_MEM_K<<10);
-	memory_end &= 0xfffff000;
+
+	memory_end = (1<<20) + (EXT_MEM_K<<10);// 实际物理内存大小 = 1MB + 扩展内存大小
+	memory_end &= 0xfffff000;//将页的内容4k清零
+
+	# 图2-02
 	if (memory_end > 16*1024*1024)
 		memory_end = 16*1024*1024;
 	if (memory_end > 12*1024*1024) 
@@ -120,7 +123,8 @@ void main(void)		/* This really IS void, no error here. */
 	else
 		buffer_memory_end = 1*1024*1024;
 	main_memory_start = buffer_memory_end;
-#ifdef RAMDISK
+
+#ifdef RAMDISK  // 有虚拟盘，main_memory_start等于虚拟品的末端 图2-03
 	main_memory_start += rd_init(main_memory_start, RAMDISK*1024);
 #endif
 	mem_init(main_memory_start,memory_end);
