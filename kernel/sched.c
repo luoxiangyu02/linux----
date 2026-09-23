@@ -392,8 +392,12 @@ void sched_init(void)
 	int i;
 	struct desc_struct * p;
 
-	if (sizeof(struct sigaction) != 16)
+	if (sizeof(struct sigaction) != 16)//信号处理函数结构体大小必须是16字节
 		panic("Struct sigaction MUST be 16 bytes");
+		//图2-17,GDT目的是描述段的!!!
+		// 一个进程在GDT中有两个描述符，一个是TSS段，一个是LDT段，
+		// TSS段描述了进程的状态，里面都是CPU的寄存器的值,保存中间的变量的值
+		// LDT段描述了进程的局部描述符表
 	set_tss_desc(gdt+FIRST_TSS_ENTRY,&(init_task.task.tss));
 	set_ldt_desc(gdt+FIRST_LDT_ENTRY,&(init_task.task.ldt));
 	p = gdt+2+FIRST_TSS_ENTRY;
