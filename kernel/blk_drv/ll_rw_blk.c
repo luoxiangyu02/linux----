@@ -154,12 +154,18 @@ void ll_rw_block(int rw, struct buffer_head * bh)
 	make_request(major,rw,bh);
 }
 
+// request从缓冲区到设备的传输是通过中断来完成的。
+// 每个设备有一个中断处理程序，当设备完成请求时，它会触发中断，内核会调用相应的中断处理程序来处理请求队列中的下一个请求。
+// 32个request，表示缓冲区有3000多个大小（从硬盘和内存之间的量级来说）2个量级
+/*“队列里最多容纳 32 个块 I/O 请求”
+“每个请求处理 2 个扇区 = 1KB”
+“总共大约 32KB 的数据量” */
 void blk_dev_init(void)
 {
 	int i;
 
 	for (i=0 ; i<NR_REQUEST ; i++) {
-		request[i].dev = -1;
+		request[i].dev = -1; // -1 表示空闲,表示没有请求
 		request[i].next = NULL;
 	}
 }

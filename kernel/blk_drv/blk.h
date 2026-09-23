@@ -80,7 +80,7 @@ extern struct task_struct * wait_for_request;
 /* harddisk */
 #define DEVICE_NAME "harddisk"
 #define DEVICE_INTR do_hd
-#define DEVICE_REQUEST do_hd_request
+#define DEVICE_REQUEST
 #define DEVICE_NR(device) (MINOR(device)/5)
 #define DEVICE_ON(device)
 #define DEVICE_OFF(device)
