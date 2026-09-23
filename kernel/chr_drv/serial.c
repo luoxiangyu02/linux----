@@ -36,6 +36,7 @@ static void init(int port)
 
 void rs_init(void)
 {
+	//初始化串口 中断门 TODO什么事串口，并口
 	set_intr_gate(0x24,rs1_interrupt);
 	set_intr_gate(0x23,rs2_interrupt);
 	init(tty_table[1].read_q.data);

@@ -129,11 +129,11 @@ void main(void)		/* This really IS void, no error here. */
 #endif
 	mem_init(main_memory_start,memory_end);
 	trap_init();
-	blk_dev_init();
-	chr_dev_init();
-	tty_init();
-	time_init();
-	sched_init();
+	blk_dev_init();// 块设备管理，主要是request数组初始化
+	chr_dev_init();//字符设备管理，主要是tty初始化
+	tty_init();//终端
+	time_init();//时钟
+	sched_init();//进程调度
 	buffer_init(buffer_memory_end);
 	hd_init();
 	floppy_init();
