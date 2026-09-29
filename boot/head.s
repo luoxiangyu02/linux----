@@ -276,3 +276,5 @@ _gdt:	.quad 0x0000000000000000	/* NULL descriptor */
 	.quad 0x0000000000000000	/* TEMPORARY - don't use */
 	.fill 252,8,0			/* space for LDT's and TSS's etc 最多64对，一共最多64进程
 				图2-17 */
+
+// desc_struct  desc_table[256] 就是gdt

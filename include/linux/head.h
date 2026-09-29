@@ -3,7 +3,7 @@
 
 typedef struct desc_struct {
 	unsigned long a,b;
-} desc_table[256];
+} desc_table[256];//就是gdt和idt的结构体描述符表,每个表有256个描述符,每个描述符是8字节,所以总共是2048字节
 
 extern unsigned long pg_dir[1024];
 extern desc_table idt,gdt;

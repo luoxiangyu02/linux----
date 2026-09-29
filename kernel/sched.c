@@ -390,7 +390,7 @@ int sys_nice(long increment)
 void sched_init(void)
 {
 	int i;
-	struct desc_struct * p;
+	struct desc_struct * p;//point to the gdt 
 
 	if (sizeof(struct sigaction) != 16)//信号处理函数结构体大小必须是16字节
 		panic("Struct sigaction MUST be 16 bytes");
