@@ -72,7 +72,7 @@ GDT[4] = user data
 		((type)<<8); \
 	*((gate_addr)+1) = (((base) & 0x0000ffff)<<16) | \
 		((limit) & 0x0ffff); }
-
+// TODO 
 #define _set_tssldt_desc(n,addr,type) \
 __asm__ ("movw $104,%1\n\t" \
 	"movw %%ax,%2\n\t" \
