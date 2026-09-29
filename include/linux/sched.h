@@ -78,7 +78,7 @@ struct tss_struct {
 struct task_struct {
 /* these are hardcoded - don't touch */
 	long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
-	long counter;
+	long counter;//时间片	PAGE_SIZE
 	long priority;
 	long signal;
 	struct sigaction sigaction[32];
@@ -87,19 +87,19 @@ struct task_struct {
 	int exit_code;
 	unsigned long start_code,end_code,end_data,brk,start_stack;
 	long pid,father,pgrp,session,leader;
-	unsigned short uid,euid,suid;
-	unsigned short gid,egid,sgid;
+	unsigned short uid,euid,suid;//uid user id
+	unsigned short gid,egid,sgid;//group id
 	long alarm;
 	long utime,stime,cutime,cstime,start_time;
 	unsigned short used_math;
 /* file system info */
 	int tty;		/* -1 if no tty, so it must be signed */
 	unsigned short umask;
-	struct m_inode * pwd;
+	struct m_inode * pwd;// 文件路径
 	struct m_inode * root;
 	struct m_inode * executable;
 	unsigned long close_on_exec;
-	struct file * filp[NR_OPEN];
+	struct file * filp[NR_OPEN];// 打开文件
 /* ldt for this task 0 - zero 1 - cs 2 - ds&ss */
 	struct desc_struct ldt[3];
 /* tss for this task */
@@ -121,11 +121,16 @@ struct task_struct {
 /* fs info */	-1,0022,NULL,NULL,NULL,0, \
 /* filp */	{NULL,}, \
 	{ \
+				// 指向一个ldt，
 		{0,0}, \
+		//TODO 用户代码段 段基址 段限长 特权级
 /* ldt */	{0x9f,0xc0fa00}, \
+// 用户数据段
 		{0x9f,0xc0f200}, \
 	}, \
+	// 就是图2-20 tss的第二项，esp指向栈顶指针，就是刚才的task_union
 /*tss*/	{0,PAGE_SIZE+(long)&init_task,0x10,0,0,0,0,(long)&pg_dir,\
+	// 第二个0是eflags，关中断是0特权级的了，图1-16 IOPL就是0，IO的特权级是0，表示IO只能由内核来操作了
 	 0,0,0,0,0,0,0,0, \
 	 0,0,0x17,0x17,0x17,0x17,0x17,0x17, \
 	 _LDT(0),0x80000000, \
@@ -150,7 +155,8 @@ extern void wake_up(struct task_struct ** p);
  * Entry into gdt where to find first TSS. 0-nul, 1-cs, 2-ds, 3-syscall
  * 4-TSS0, 5-LDT0, 6-TSS1 etc ...
  */
-#define FIRST_TSS_ENTRY 4
+// tu 2-17
+ #define FIRST_TSS_ENTRY 4
 #define FIRST_LDT_ENTRY (FIRST_TSS_ENTRY+1)
 #define _TSS(n) ((((unsigned long) n)<<4)+(FIRST_TSS_ENTRY<<3))
 #define _LDT(n) ((((unsigned long) n)<<4)+(FIRST_LDT_ENTRY<<3))

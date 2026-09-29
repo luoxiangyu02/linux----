@@ -109,7 +109,7 @@ rp_sidt:
  *  rather long comment is certainly needed :-).
  *  This routine will beoverwritten by the page tables.
  */
-setup_gdt:
+setup_gdt:// gdtr 是 cpu内一部分
 	lgdt gdt_descr
 	ret
 
@@ -270,6 +270,7 @@ gdt_descr:
 	.align 3
 _idt:	.fill 256,8,0		# idt is uninitialized
 
+TODO// 内核代码、数据段的段基址，段限长，特权级
 _gdt:	.quad 0x0000000000000000	/* NULL descriptor */
 	.quad 0x00c09a0000000fff	/* 段限长变了。 16Mb 内核代码段 由原来的setup.c 的8Mb变为16Mb*/
 	.quad 0x00c0920000000fff	/* 16Mb 内核数据段*/

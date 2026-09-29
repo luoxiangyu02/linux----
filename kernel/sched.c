@@ -50,12 +50,15 @@ extern void mem_use(void);
 extern int timer_interrupt(void);
 extern int system_call(void);
 
-union task_union {
-	struct task_struct task;
-	char stack[PAGE_SIZE];
-};
+//该进程的内核栈,共用一个空间,不会被相互覆盖	
+union task_union {//图2-20
+	struct task_struct task;//任务描述符
+	char stack[PAGE_SIZE];//内核栈
+};//没有脱离进程的内核,内核就是进程的内核态上下文
 
-static union task_union init_task = {INIT_TASK,};
+//全局变量
+//进程0的task_union
+static union task_union init_task = {INIT_TASK,};//定义一个task_union实例,并初始化
 
 long volatile jiffies=0;
 long startup_time=0;
@@ -394,10 +397,12 @@ void sched_init(void)
 
 	if (sizeof(struct sigaction) != 16)//信号处理函数结构体大小必须是16字节
 		panic("Struct sigaction MUST be 16 bytes");
+
 		//图2-17,GDT目的是描述段的!!!
 		// 一个进程在GDT中有两个描述符，一个是TSS段，一个是LDT段，
 		// TSS段描述了进程的状态，里面都是CPU的寄存器的值,保存中间的变量的值
 		// LDT段描述了进程的局部描述符表,一个代码段一个数据段,每一个进程都有一个
+		// total is 64 tss and ldt 64*2=128+4=132
 	set_tss_desc(gdt+FIRST_TSS_ENTRY,&(init_task.task.tss));
 	set_ldt_desc(gdt+FIRST_LDT_ENTRY,&(init_task.task.ldt));
 	p = gdt+2+FIRST_TSS_ENTRY;
