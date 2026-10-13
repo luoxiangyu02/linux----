@@ -134,7 +134,7 @@
 type name(void) \
 { \
 long __res; \
-__asm__ volatile ("int $0x80" \
+__asm__ volatile ("int $0x80" \ //就是中断号0x80，Linux系统调用的入口
 	: "=a" (__res) \
 	: "0" (__NR_##name)); \
 if (__res >= 0) \

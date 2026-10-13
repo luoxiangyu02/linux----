@@ -396,7 +396,7 @@ void do_no_page(unsigned long error_code,unsigned long address)
 	oom();
 }
 
-// 图2-05
+// 图2-05,给进程分配内存空间,初始化内存管理数据结构，内存的分配单位是进程
 void mem_init(long start_mem, long end_mem)
 {
 	int i;

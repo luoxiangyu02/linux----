@@ -1,12 +1,14 @@
 #define move_to_user_mode() \
 __asm__ ("movl %%esp,%%eax\n\t" \
-	"pushl $0x17\n\t" \
-	"pushl %%eax\n\t" \
-	"pushfl\n\t" \
-	"pushl $0x0f\n\t" \
+	"pushl $0x17\n\t" \ 0x17 is user data segment selector,LDT 中的第三个，第一个是null，第二是代码段，第三是数据段
+	"pushl %%eax\n\t" \ // ss esp eflags cs eip 顺序记住和中断关联，中断自动的进行压栈，中断返回的时候自动pop
+	"pushfl\n\t" \ //flags寄存器压栈
+	"pushl $0x0f\n\t" \3特权，LDT，1是第二个LDT的代码段，是进程0的代码段
 	"pushl $1f\n\t" \
-	"iret\n" \
+	"iret\n" \前面是0特权内核 后面都是3特权应用程序了
 	"1:\tmovl $0x17,%%eax\n\t" \
+// 进程0的用户栈就是原来的内核栈
+// 进程0的3特权级代码
 	"movw %%ax,%%ds\n\t" \
 	"movw %%ax,%%es\n\t" \
 	"movw %%ax,%%fs\n\t" \
